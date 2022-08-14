@@ -4,7 +4,8 @@ import Order from '../../../models/Order'
 dbConnect()
 
 export default async function handler(req, res) {
-    const { method } = req
+    const { method, cookies } = req
+    const token = cookies.token
 
     if(method === 'GET'){
         try {
@@ -16,6 +17,9 @@ export default async function handler(req, res) {
     }
 
     if(method === 'POST'){
+        if(!token || token !== process.env.TOKEN){
+            res.status(401).json('Not authenticated!')
+        }
         try {
             const order = await Order.create(req.body)
             res.status(201).json(order)
